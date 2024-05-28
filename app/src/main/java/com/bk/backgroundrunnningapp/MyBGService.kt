@@ -28,7 +28,7 @@ class MyBGService : Service() {
 
     override fun onCreate() {
         Timer().schedule(0L, 1000L) {
-            callQuizApi()
+            Log.i("MESSAGE FROM SERVICE","TEST MESSAGE")
         }
         startForeground()
         super.onCreate()
@@ -54,7 +54,6 @@ class MyBGService : Service() {
                 .setContentIntent(pendingIntent)
                 .build()
         )
-
     }
 
     fun callQuizApi() {
