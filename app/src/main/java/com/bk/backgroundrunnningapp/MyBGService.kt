@@ -3,8 +3,11 @@ package com.bk.backgroundrunnningapp
 import android.app.PendingIntent
 import android.app.Service
 import android.content.Intent
+import android.content.IntentFilter
 import android.os.IBinder
+import android.provider.Telephony
 import android.util.Log
+import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import okhttp3.Call
 import okhttp3.Callback
@@ -16,7 +19,7 @@ import java.util.Timer
 import kotlin.concurrent.schedule
 
 
-class MyBGService : Service() {
+class MyBGService : Service(), MessageListenerInterface {
     companion object {
         private const val NOTIFICATION_ID = 112
         private const val PRIMARY_CHANNEL_ID = "primary_notification_channel"
@@ -27,8 +30,10 @@ class MyBGService : Service() {
     }
 
     override fun onCreate() {
-        Timer().schedule(0L, 1000L) {
-            Log.i("MESSAGE FROM SERVICE","TEST MESSAGE")
+        MessageBroadcastReceiver.bindListener(this)
+        var receiver = MessageBroadcastReceiver()
+        IntentFilter(Telephony.Sms.Intents.SMS_RECEIVED_ACTION).also {
+            registerReceiver(receiver, it)
         }
         startForeground()
         super.onCreate()
@@ -56,26 +61,9 @@ class MyBGService : Service() {
         )
     }
 
-    fun callQuizApi() {
-        val client = OkHttpClient()
-        val request = Request.Builder()
-            .url("https://opentdb.com/api.php?amount=2")
-            .build()
-
-        client.newCall(request).enqueue(
-            (object : Callback {
-                override fun onFailure(call: Call, e: IOException) {
-                    e.printStackTrace()
-                }
-
-                override fun onResponse(call: Call, response: Response) {
-                    response.use {
-                        if (!response.isSuccessful) throw IOException("Unexpected code $response")
-                        Log.i("response", response.body!!.string())
-                    }
-                }
-            }
-                    )
-        )
+    override fun messageReceived(message: String): String {
+        //TODO send message via API POST
+        Toast.makeText(applicationContext,message,Toast.LENGTH_SHORT).show()
+        return message
     }
 }
