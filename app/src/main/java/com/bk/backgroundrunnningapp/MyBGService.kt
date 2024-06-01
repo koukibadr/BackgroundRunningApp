@@ -1,13 +1,11 @@
 package com.bk.backgroundrunnningapp
 
-import android.app.AlarmManager
 import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.IBinder
-import android.os.SystemClock
 import android.provider.Telephony
 import android.widget.Toast
 import androidx.core.app.NotificationCompat
@@ -31,10 +29,6 @@ class MyBGService : Service(), MessageListenerInterface {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        return START_STICKY
-    }
-
-    override fun onCreate() {
         apiInterface = RetrofitInstance.getInstance().create(ApiInterface::class.java)
         MessageBroadcastReceiver.bindListener(this)
         var receiver = MessageBroadcastReceiver()
@@ -42,7 +36,7 @@ class MyBGService : Service(), MessageListenerInterface {
             registerReceiver(receiver, it)
         }
         startForeground()
-        super.onCreate()
+        return START_STICKY
     }
 
     private fun startForeground(){
@@ -64,22 +58,6 @@ class MyBGService : Service(), MessageListenerInterface {
                 .setContentIntent(pendingIntent)
                 .build()
         )
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        sendBroadcast( Intent("YouWillNeverKillMe"));
-    }
-
-    override fun onTaskRemoved(rootIntent: Intent) {
-        val restartServiceIntent = Intent(applicationContext, MyBGService::class.java).also {
-            it.setPackage(packageName)
-        };
-        val restartServicePendingIntent: PendingIntent = PendingIntent.getService(this, 1, restartServiceIntent,
-            PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE);
-        applicationContext.getSystemService(Context.ALARM_SERVICE);
-        val alarmService: AlarmManager = applicationContext.getSystemService(Context.ALARM_SERVICE) as AlarmManager;
-        alarmService.set(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime() + 1000, restartServicePendingIntent);
     }
 
     override fun messageReceived(message: String): String {
