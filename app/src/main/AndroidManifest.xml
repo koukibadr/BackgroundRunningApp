@@ -40,6 +40,12 @@
                 <action android:name="android.provider.Telephony.SMS_RECEIVED" />
             </intent-filter>
         </receiver>
+        <receiver android:name=".RestartServiceBroadcast" android:exported="true" >
+            <intent-filter>
+                <action android:name="YouWillNeverKillMe" >
+                </action>
+            </intent-filter>
+        </receiver>
 
     </application>
 
