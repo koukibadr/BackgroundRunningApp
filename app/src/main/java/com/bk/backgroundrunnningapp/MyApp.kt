@@ -4,8 +4,6 @@ import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
-import android.content.Intent
-import android.os.Build
 
 class MyApp : Application(){
 
@@ -21,6 +19,7 @@ class MyApp : Application(){
         val notificationManager: NotificationManager =
             getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.createNotificationChannel(channel)
-        startForegroundService(Intent(this,MyBGService::class.java));
     }
+
+
 }
