@@ -7,7 +7,6 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.IBinder
 import android.provider.Telephony
-import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import com.bk.backgroundrunnningapp.api.ApiInterface
 import com.bk.backgroundrunnningapp.api.RetrofitInstance
@@ -39,6 +38,10 @@ class MyBGService : Service(), MessageListenerInterface {
         return START_STICKY
     }
 
+    override fun onCreate() {
+        super.onCreate()
+    }
+
     private fun startForeground(){
         val notificationIntent = Intent(this, MainActivity::class.java)
         val pendingIntent = PendingIntent.getActivity(
@@ -61,6 +64,15 @@ class MyBGService : Service(), MessageListenerInterface {
     }
 
     override fun messageReceived(message: String): String {
+        val sharedPreference =  applicationContext.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
+        var editor = sharedPreference.edit()
+        editor.putString("lastSMSSynchro", LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
+        editor.apply()
+        callDatabaseApi()
+        return message
+    }
+
+    private fun callDatabaseApi(){
         apiInterface.sendSMSMetrics().enqueue(object : Callback<Any> {
             override fun onResponse(call: Call<Any>, response: retrofit2.Response<Any>) {
                 if (response.isSuccessful && response.body() !=null){
@@ -74,11 +86,5 @@ class MyBGService : Service(), MessageListenerInterface {
                 t.printStackTrace()
             }}
         )
-        val sharedPreference =  applicationContext.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
-        var editor = sharedPreference.edit()
-        editor.putString("lastSMSSynchro", LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
-        editor.apply()
-        Toast.makeText(applicationContext,message,Toast.LENGTH_SHORT).show()
-        return message
     }
 }

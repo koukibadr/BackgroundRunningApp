@@ -21,5 +21,4 @@ class MyApp : Application(){
         notificationManager.createNotificationChannel(channel)
     }
 
-
 }

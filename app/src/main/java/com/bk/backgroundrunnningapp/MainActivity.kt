@@ -3,6 +3,7 @@ package com.bk.backgroundrunnningapp
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -35,7 +36,7 @@ class MainActivity : AppCompatActivity() {
             if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 startForegroundService(Intent(this,MyBGService::class.java))
             } else {
-                ///Explain why sms receiving is crucial in the app
+                Toast.makeText(this,"Application won't be able to listen to your SMS", Toast.LENGTH_SHORT).show()
             }
         }
     }
